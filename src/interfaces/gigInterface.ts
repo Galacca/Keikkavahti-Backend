@@ -11,3 +11,9 @@ export interface Gig extends RowDataPacket {
   interestedUsers: Array<string>
   AttendingUsers: Array<string>
 }
+
+export interface GigDataResult extends RowDataPacket {
+  id: string
+  bands: string
+  date: string
+}

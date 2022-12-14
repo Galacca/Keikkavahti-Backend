@@ -7,6 +7,5 @@ const router = express.Router();
 router.post('/post/login', controller.login);
 router.post('/post/signup', controller.signup);
 router.post('/post/addfriend', auth, controller.addFriend);
-router.get('/get/friendslist', auth, controller.getFriendsList)
 
 export = router;

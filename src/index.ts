@@ -2,6 +2,7 @@ import http from 'http';
 import config from './config/config';
 import allGigRoutes from './routes/gigs'
 import allUserRoutes from './routes/users'
+import allFriendRoutes from './routes/friends'
 import express from 'express';
 import bodyParser from 'body-parser'
 import cors from 'cors';
@@ -17,7 +18,7 @@ const corsOpts = {
   ],
 
   allowedHeaders: [
-    'Content-Type',
+    'Content-Type', 'Authorization'
   ],
 };
 
@@ -25,21 +26,9 @@ router.use(cors(corsOpts));
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 
-// router.use((req, res, next) => {
-              
-//   res.header('Access-Control-Allow-Origin', '*');
-//   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-
-//   if (req.method == 'OPTIONS') {
-//       res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
-//       return res.status(200).json({});
-//   }
-
-//   next();
-// });
-
 router.use('/users', allUserRoutes);
 router.use('/gigs', allGigRoutes);
+router.use('/friends', allFriendRoutes)
 
 
 router.use((req, res, next) => {

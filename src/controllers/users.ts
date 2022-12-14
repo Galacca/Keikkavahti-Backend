@@ -49,9 +49,11 @@ const login = async (req: Request, res: Response) => {
     try {
 
         const userForToken = {
-            username: user.username,
+            name: user.name,
             id: user.id,
-          }
+        }
+
+        console.log(userForToken)
         const token = jwt.sign(userForToken, process.env.TOKEN_SECRET as Secret)
 
         return res
@@ -120,7 +122,7 @@ const signup = async (req: Request, res: Response) => {
     connection.end()
 
     return res
-        .status(200)
+        .status(201)
         .json("New user added succesfully");
 
     } catch (error: any) {
@@ -132,74 +134,41 @@ const signup = async (req: Request, res: Response) => {
 
 const addFriend = async (req: Request, res: Response) => {
 
-    const friendRequester: string = req.body.decodedToken.id
-    const friendToAdd: string = req.body.friendToAddId
+    const friendRequester: number = req.body.decodedToken.id
+    //Type this for name
+    const friendToAdd: string = req.body.friendToAddName
 
     try {
 
         const connection = await Connect()
-
-        if (friendToAdd === "0" || null || undefined) throw new Error("Invalid friend index")
         
-        const friendsQuery = `SELECT friends FROM users WHERE id = ${connection.escape(friendRequester)}`
-        //This should have a custom query as it definitely does not return a User
-        const friendsResult = await UserQuery(connection, friendsQuery) as any
-        let addNewFriendQuery
+        const newFriendExistsQuery = `SELECT EXISTS(SELECT name FROM users WHERE name = ${connection.escape(friendToAdd)}) as TRUTH`
+        const newFriendExistsResult = await UserQuery(connection, newFriendExistsQuery)
+        if (newFriendExistsResult[0].TRUTH === 0) throw new Error("User named " + friendToAdd + " does not exist.")
+
+        const userIsFriendToAddQuery = `SELECT id FROM users WHERE name = ${connection.escape(friendToAdd)}`
+        const userIsFriendToAddResult = await UserQuery(connection, userIsFriendToAddQuery)
+        if (userIsFriendToAddResult[0].id === friendRequester) throw new Error("You cannot add yourself as your friend.")
+       
+        const duplicateFriendQuery = `SELECT EXISTS(SELECT id FROM friends WHERE friendName = ` + connection.escape(friendToAdd) + ` AND userId = ` + connection.escape(friendRequester) +`) as TRUTH`
+        const duplicateFriendResult = await UserQuery(connection, duplicateFriendQuery) as any
+        if (duplicateFriendResult[0].TRUTH === 1) throw new Error("User named " + friendToAdd + " is already on your friends list.")
         
-        //The DB initializes new users with a default value of [0]. Reasoning here is that it is by far easier to replace than NULL or "" since I dont have to tell the
-        //Entry that it's supposed to be a JSON_ARRAY to begin with...If I do that it also adds the NULL or "" as an element...
-        //This does result in a slight annoyance when returning empty friends lists since the list will never truly be empty. 
-        //However I cannot think of a better solution, if there even is one.
-        //To be fair this is my first time dabbling with JSON entries in SQL so there was bound to be some dumb stuff happening somewhere
-
-        if (friendsResult[0].friends.toString() === "[0]") {
-
-            addNewFriendQuery = `UPDATE users SET friends = JSON_REPLACE(friends, "$[0]", ${connection.escape(friendToAdd)}) WHERE id = ${connection.escape(friendRequester)}`
-
-        } else {
-
-            addNewFriendQuery = `UPDATE users SET friends = JSON_ARRAY_APPEND(friends, "$", ${connection.escape(friendToAdd)}) WHERE id = ${connection.escape(friendRequester)}`
-
-        }
-        
-        const results = await UserQuery(connection, addNewFriendQuery)
+        const addNewFriendQuery = `INSERT INTO friends (userId, friendName) VALUES (${connection.escape(friendRequester)},${connection.escape(friendToAdd)})`
+        console.log(addNewFriendQuery)
+        await UserQuery(connection, addNewFriendQuery)
         connection.end
     
     return res
-        .status(200)
-        .json(results)
+        .status(201)
+        .json("New friend added succesfully")
         
 
     } catch (error: any) {
         return res
         .status(400)
-        .json({ message: error.message, field: 'critical'})
+        .json({ message: error.message, field: 'friendToAddName'})
     }
 }
 
-const getFriendsList = async (req: Request, res: Response) => {
-    
-    const userId: string = req.body.decodedToken.id
-
-    try {
-
-        const connection = await Connect()
-        const friendsQuery = `SELECT friends FROM users WHERE id = ${connection.escape(userId)}`
-        //Once again...Need to write a type for this
-        const friendsResult = await UserQuery(connection, friendsQuery) as any
-
-        if (friendsResult[0].friends.toString() === "[0]") return res.status(200).json({ friends: 'User has no friends' })
-
-        return res
-            .status(200)
-            .json(friendsResult)
-
-    } catch (error: any) {
-        return res
-        .status(400)
-        .json({ message: error.message, field: 'critical'})
-    }
-
-}
-
-export default { login, signup, addFriend, getFriendsList };
+export default { login, signup, addFriend };

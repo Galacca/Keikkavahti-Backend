@@ -1,7 +1,7 @@
 import mysql from 'mysql2';
 import config from './config';
 import { User } from '../interfaces/userInterface'
-import { Gig } from '../interfaces/gigInterface';
+import { Gig, GigDataResult } from '../interfaces/gigInterface';
 
 const params = {
     user: config.mysql.user,
@@ -36,6 +36,19 @@ const UserQuery = (connection: mysql.Connection, query: string): Promise<User[]>
         });
 });
 
+
+const TempQuery = (connection: mysql.Connection, query: string): Promise<GigDataResult[]> => 
+    new Promise((resolve, reject) => {
+        connection.query<GigDataResult[]>(query, (error, result) => {
+            if (error) {
+                reject(error);
+                return;
+            }
+
+            resolve(result);
+        });
+});
+
 const GigQuery = (connection: mysql.Connection, query: string): Promise<Gig[]> => 
     new Promise((resolve, reject) => {
         connection.query<Gig[]>(query, (error, result) => {
@@ -61,4 +74,4 @@ const ParamQuery = (connection: mysql.Connection, query: string, pArray: String[
 }) 
 
 
-export { Connect, UserQuery, GigQuery, ParamQuery };
+export { Connect, UserQuery, GigQuery, ParamQuery, TempQuery };
