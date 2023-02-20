@@ -4,6 +4,7 @@ import { Connect, UserQuery } from "../config/mysql"
 const getFriendsList = async (req: Request, res: Response) => {
     
     const userId: string = req.body.decodedToken.id
+    
 
     try {
 
@@ -13,10 +14,11 @@ const getFriendsList = async (req: Request, res: Response) => {
         const friendsResult = await UserQuery(connection, friendsQuery) as any
         console.log(friendsResult)
         const friendsArray = friendsResult.map((f: { friendName: string }) => f.friendName)
-
+        connection.end() 
         //Just for debugging
         //if (friendsArray.length === 0) return res.status(200).json({ friends: 'User has no friends' })
 
+        
         return res
             .status(200)
             .json(friendsArray)
@@ -26,6 +28,8 @@ const getFriendsList = async (req: Request, res: Response) => {
         .status(400)
         .json({ message: error.message, field: 'critical'})
     }
+
+   
 
 }
 

@@ -34,9 +34,4 @@ export const SignUpSchema = z.object({
     .max(15)
     .min(3)
     .regex(alphanumerical, regExpError),
-    email: z
-    .string()
-    .max(50)
-    .email()
-
 })

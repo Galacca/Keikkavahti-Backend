@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { Connection } from 'mysql2';
 import { Connect, GigQuery, TempQuery } from '../config/mysql';
+import { appendStatusToResponse } from '../utils/appendStatusToResponse';
 
 const currentDate = new Date().toISOString()
 
@@ -81,14 +81,16 @@ const tagGig = async (req: Request, res: Response) => {
 
         const connection = await Connect()
         const duplicateTagQuery = `SELECT status FROM taggedgigs WHERE gigId = ${connection.escape(gigId)} AND userName = ${connection.escape(userName)}`
+        
         //Deconstruct this
         const isDuplicateTag = await GigQuery(connection, duplicateTagQuery) as any
         let tagQuery
        
         if (isDuplicateTag.length === 0) {
-
-            //Jesus christ help me
-            tagQuery = `INSERT into taggedgigs (gigId, userName, status) VALUES (` + connection.escape(gigId) + ',' + connection.escape(userName)  + ',' + connection.escape(operation) + ')'
+            const dateQuery = `SELECT date FROM gigs WHERE id = ${connection.escape(gigId)}`
+            const dateResult = await GigQuery(connection, dateQuery)
+            //Jesus christ help me. 
+            tagQuery = `INSERT into taggedgigs (gigId, userName, status, date) VALUES (` + connection.escape(gigId) + ',' + connection.escape(userName)  + ',' + connection.escape(operation) + ',' + connection.escape(dateResult[0].date) + ')'
 
         } else {
             
@@ -97,11 +99,14 @@ const tagGig = async (req: Request, res: Response) => {
             tagQuery = `UPDATE taggedgigs SET status = ${connection.escape(operation)} WHERE gigId = ${connection.escape(gigId)} AND userName = ${connection.escape(userName)}`
         }
         
-        const tagResult = await GigQuery(connection, tagQuery) as any
+        //We do not need this is a variable since the frontend 'mimics' the database changes with state
+        await GigQuery(connection, tagQuery) as any
+
+        connection.end()
 
         return res
             .status(200)
-            .json(tagResult)
+            .json({message: 'Operation success'})
 
     } catch (error: any) {
         console.log(error.message)
@@ -116,40 +121,37 @@ const getUsersTaggedGigs = async (req: Request, res: Response) => {
 
     const name: string = req.body.name
 
+    console.log(name)
     try {
 
         const connection = await Connect()
-        const getTaggedGigsQuery = `SELECT gigId, status FROM taggedgigs WHERE userName = ${connection.escape(name)}`
+        const getTaggedGigsQuery = `SELECT gigId, status FROM taggedgigs WHERE userName = ${connection.escape(name)} AND date > "${currentDate} ORDER BY date ASC"`
         const getTaggedGigsResult = await GigQuery(connection, getTaggedGigsQuery) as any
+
+        //console.log(getTaggedGigsResult)
         
         if (getTaggedGigsResult.length !== 0) {
 
             const mappedResults = getTaggedGigsResult.map((g: { gigId: string; }) => g.gigId)
-            const gigDataQuery = `SELECT date, bands, id, venue FROM gigs WHERE id IN (${mappedResults})`
+            const gigDataQuery = `SELECT date, bands, id, venue FROM gigs WHERE id IN (${mappedResults}) ORDER BY date ASC`
             const gigDataResult = await TempQuery(connection, gigDataQuery)
            
-            //Assign the statuses we got earlier to the response object
-            getTaggedGigsResult.map((g: { gigId: string, status: string }) => {
-                
-                const entry = {
-                    status: g.status
-                }
-                
-                const index: number = gigDataResult.findIndex(item => item.id === g.gigId)
-                Object.assign(gigDataResult[index], entry)
-                
-            })
+            const appendedResponse = appendStatusToResponse(getTaggedGigsResult, gigDataResult)
            
+            connection.end()
             return res
             .status(200)
-            .json(gigDataResult)
+            .json(appendedResponse)
         }
         
+        connection.end
+        console.log("No tagged gigs found")
         return res
-            .status(400)
+            .status(200)
             .json("User has no tagged gigs")
 
     } catch (error: any) {
+        console.log(error)
         return res
         .status(400)
         .json({ message: error.message, field: 'critical'})
@@ -157,4 +159,29 @@ const getUsersTaggedGigs = async (req: Request, res: Response) => {
 
 }
 
-export default { getAllGigs, getGigsByMonth, tagGig, getUsersTaggedGigs };
+const deleteTag = async (req: Request, res: Response) => {
+
+    const userName: string = req.body.decodedToken.name
+    const gigId: number = req.body.gigToDeleteId
+
+    try {
+
+        const connection = await Connect()
+        const deleteTagQuery = `DELETE FROM taggedgigs WHERE userName = ${connection.escape(userName)} AND gigId = "${gigId}"`
+        const deleteTagResult = await GigQuery(connection, deleteTagQuery) as any
+
+        connection.end()
+
+        return res
+            .status(200)
+            .json(deleteTagResult)
+
+    } catch (error: any) {
+        console.log(error)
+        return res
+        .status(400)
+        .json({ message: error.message, field: 'critical'})
+    }
+
+}
+export default { getAllGigs, getGigsByMonth, tagGig, getUsersTaggedGigs, deleteTag };

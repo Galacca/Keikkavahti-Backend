@@ -10,17 +10,18 @@ const SECRET_KEY: Secret = process.env.TOKEN_SECRET as Secret
 export const auth = async (req: Request, res: Response, next: NextFunction) => {
  try {
    const token = req.header('Authorization')?.substring(7)
-
+   
    if (!token) {
      throw new Error();
    }
-
+   
    const decodedToken = jwt.verify(token, SECRET_KEY)
 
    req.body.decodedToken = decodedToken
 
    next();
  } catch (err) {
+   console.log("Authorization failure")
    res.status(401).send('Authorization failure');
  }
 };

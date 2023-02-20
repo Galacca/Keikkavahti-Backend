@@ -17,3 +17,10 @@ export interface GigDataResult extends RowDataPacket {
   bands: string
   date: string
 }
+
+export interface SimplifiedGig extends RowDataPacket {
+  date: string,
+  bands: string,
+  id: string,
+  venue: string
+}

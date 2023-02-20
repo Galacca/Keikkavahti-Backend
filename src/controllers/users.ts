@@ -4,6 +4,7 @@ import { LoginSchema, SignUpSchema } from "../schema/UserSchema"
 import { ZodIssue }from "zod"
 import argon2 from "argon2"
 import jwt, { Secret } from 'jsonwebtoken'
+import { signToken } from "../utils/signToken"
 
 
 const login = async (req: Request, res: Response) => {
@@ -23,7 +24,7 @@ const login = async (req: Request, res: Response) => {
     const queriedUser = await UserQuery(connection, findUserQuery)
     //user can end up as undefined, but we catch it early and throw. Still not the best solution? Not sure.
     const user = queriedUser[0]
-    connection.end
+    connection.end()
 
     try {
         
@@ -52,9 +53,8 @@ const login = async (req: Request, res: Response) => {
             name: user.name,
             id: user.id,
         }
-
-        console.log(userForToken)
-        const token = jwt.sign(userForToken, process.env.TOKEN_SECRET as Secret)
+        
+        const token = signToken(userForToken)
 
         return res
         .status(200)
@@ -90,7 +90,7 @@ const signup = async (req: Request, res: Response) => {
     if (Object.values(duplicateUsername[0]).includes(1)) throw new Error('Username already exists')
 
     } catch (error: any) {
-        connection.end
+        connection.end()
         return res
         .status(400)
         .json({ message: error.message, field: 'username'})
@@ -115,15 +115,26 @@ const signup = async (req: Request, res: Response) => {
     try {
     
     const hashedPassword = await argon2.hash(req.body.password)
-    const hashedEmail = await argon2.hash(req.body.email)
-    //Escape the hashed password and email too since it can contain special characters that confuse the query
-    const insertNewUserquery = `INSERT INTO users (username, password, name, email) VALUES (${connection.escape(req.body.username.toLowerCase())},${connection.escape(hashedPassword)},${connection.escape(req.body.name)},${connection.escape(hashedEmail)})`
+    //Escape the hashed password since it can contain special characters that confuse the query
+    const insertNewUserquery = `INSERT INTO users (username, password, name) VALUES (${connection.escape(req.body.username.toLowerCase())},${connection.escape(hashedPassword)},${connection.escape(req.body.name)})`
     await UserQuery(connection, insertNewUserquery)
+    //Get the newly inserted data so we can sign them in right away. We have to do this since we do not know the ID otherwise.
+    const findUserQuery = `SELECT * FROM users WHERE username = ` + connection.escape(req.body.username.toLowerCase()) + ``
+    const queriedUser = await UserQuery(connection, findUserQuery)
+    const user = queriedUser[0]
+    console.log(user)
     connection.end()
 
+    const userForToken = {
+        name: user.name,
+        id: user.id,
+    }
+
+    const token = signToken(userForToken)
+
     return res
-        .status(201)
-        .json("New user added succesfully");
+        .status(200)
+        .json({token : token, user : user.username, id : user.id, name : user.name})
 
     } catch (error: any) {
         return res
@@ -157,7 +168,7 @@ const addFriend = async (req: Request, res: Response) => {
         const addNewFriendQuery = `INSERT INTO friends (userId, friendName) VALUES (${connection.escape(friendRequester)},${connection.escape(friendToAdd)})`
         console.log(addNewFriendQuery)
         await UserQuery(connection, addNewFriendQuery)
-        connection.end
+        connection.end()
     
     return res
         .status(201)

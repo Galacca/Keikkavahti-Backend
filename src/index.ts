@@ -10,15 +10,16 @@ import cors from 'cors';
 const router = express();
 
 const corsOpts = {
-  origin: '*',
+  origin: 'http://127.0.0.1:5173',
 
   methods: [
     'GET',
     'POST',
+    'DELETE'
   ],
 
   allowedHeaders: [
-    'Content-Type', 'Authorization'
+    'Content-Type', 'Authorization',
   ],
 };
 

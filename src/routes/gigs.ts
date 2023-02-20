@@ -7,5 +7,6 @@ router.get('/get/allgigs', controller.getAllGigs);
 router.post('/get/bymonth', controller.getGigsByMonth);
 router.post('/post/tagGig', auth, controller.tagGig)
 router.post('/post/getTaggedGigs', auth, controller.getUsersTaggedGigs)
+router.delete('/delete/tagGig', auth, controller.deleteTag)
 
 export = router;
