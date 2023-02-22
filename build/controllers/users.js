@@ -111,7 +111,7 @@ var login = function (req, res) { return __awaiter(void 0, void 0, void 0, funct
     });
 }); };
 var signup = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var connection, duplicateUserQuery, duplicateUsername, error_2, duplicateNameQuery, duplicateName, error_3, hashedPassword, hashedEmail, insertNewUserquery, findUserQuery, queriedUser, user, userForToken, token, error_4;
+    var connection, duplicateUserQuery, duplicateUsername, error_2, duplicateNameQuery, duplicateName, error_3, hashedPassword, insertNewUserquery, findUserQuery, queriedUser, user, userForToken, token, error_4;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -160,26 +160,24 @@ var signup = function (req, res) { return __awaiter(void 0, void 0, void 0, func
                         .status(400)
                         .json({ message: error_3.message, field: 'name' })];
             case 9:
-                _a.trys.push([9, 14, , 15]);
-                return [4 /*yield*/, argon2_1.default.hash(req.body.password)];
+                _a.trys.push([9, 13, , 14]);
+                return [4 /*yield*/, argon2_1.default.hash(req.body.password)
+                    //Escape the hashed password since it can contain special characters that confuse the query
+                ];
             case 10:
                 hashedPassword = _a.sent();
-                return [4 /*yield*/, argon2_1.default.hash(req.body.email)
-                    //Escape the hashed password and email too since it can contain special characters that confuse the query
-                ];
-            case 11:
-                hashedEmail = _a.sent();
-                insertNewUserquery = "INSERT INTO users (username, password, name, email) VALUES (".concat(connection.escape(req.body.username.toLowerCase()), ",").concat(connection.escape(hashedPassword), ",").concat(connection.escape(req.body.name), ",").concat(connection.escape(hashedEmail), ")");
+                insertNewUserquery = "INSERT INTO users (username, password, name) VALUES (".concat(connection.escape(req.body.username.toLowerCase()), ",").concat(connection.escape(hashedPassword), ",").concat(connection.escape(req.body.name), ")");
                 return [4 /*yield*/, (0, mysql_1.UserQuery)(connection, insertNewUserquery)
                     //Get the newly inserted data so we can sign them in right away. We have to do this since we do not know the ID otherwise.
                 ];
-            case 12:
+            case 11:
                 _a.sent();
                 findUserQuery = "SELECT * FROM users WHERE username = " + connection.escape(req.body.username.toLowerCase()) + "";
                 return [4 /*yield*/, (0, mysql_1.UserQuery)(connection, findUserQuery)];
-            case 13:
+            case 12:
                 queriedUser = _a.sent();
                 user = queriedUser[0];
+                console.log(user);
                 connection.end();
                 userForToken = {
                     name: user.name,
@@ -189,12 +187,12 @@ var signup = function (req, res) { return __awaiter(void 0, void 0, void 0, func
                 return [2 /*return*/, res
                         .status(200)
                         .json({ token: token, user: user.username, id: user.id, name: user.name })];
-            case 14:
+            case 13:
                 error_4 = _a.sent();
                 return [2 /*return*/, res
                         .status(400)
                         .json({ message: error_4.message, field: 'critical' })];
-            case 15: return [2 /*return*/];
+            case 14: return [2 /*return*/];
         }
     });
 }); };

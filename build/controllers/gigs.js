@@ -37,6 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var mysql_1 = require("../config/mysql");
+var appendStatusToResponse_1 = require("../utils/appendStatusToResponse");
 var currentDate = new Date().toISOString();
 var getAllGigs = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
@@ -102,7 +103,7 @@ var getGigsByMonth = function (req, res) { return __awaiter(void 0, void 0, void
     });
 }); };
 var tagGig = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var userName, gigId, operation, connection, duplicateTagQuery, isDuplicateTag, tagQuery, dateQuery, dateResult, tagResult, error_1;
+    var userName, gigId, operation, connection, duplicateTagQuery, isDuplicateTag, tagQuery, dateQuery, dateResult, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -136,13 +137,16 @@ var tagGig = function (req, res) { return __awaiter(void 0, void 0, void 0, func
                     throw new Error('You are already tagged as ' + operation + ' this gig.');
                 tagQuery = "UPDATE taggedgigs SET status = ".concat(connection.escape(operation), " WHERE gigId = ").concat(connection.escape(gigId), " AND userName = ").concat(connection.escape(userName));
                 _a.label = 6;
-            case 6: return [4 /*yield*/, (0, mysql_1.GigQuery)(connection, tagQuery)];
+            case 6: 
+            //We do not need this is a variable since the frontend 'mimics' the database changes with state
+            return [4 /*yield*/, (0, mysql_1.GigQuery)(connection, tagQuery)];
             case 7:
-                tagResult = _a.sent();
+                //We do not need this is a variable since the frontend 'mimics' the database changes with state
+                _a.sent();
                 connection.end();
                 return [2 /*return*/, res
                         .status(200)
-                        .json(tagResult)];
+                        .json({ message: 'Operation success' })];
             case 8:
                 error_1 = _a.sent();
                 console.log(error_1.message);
@@ -154,46 +158,38 @@ var tagGig = function (req, res) { return __awaiter(void 0, void 0, void 0, func
     });
 }); };
 var getUsersTaggedGigs = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var name, connection, getTaggedGigsQuery, getTaggedGigsResult, mappedResults, gigDataQuery, gigDataResult_1, error_2;
+    var name, connection, getTaggedGigsQuery, getTaggedGigsResult, mappedResults, gigDataQuery, gigDataResult, appendedResponse, error_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 name = req.body.name;
+                console.log(name);
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 6, , 7]);
                 return [4 /*yield*/, (0, mysql_1.Connect)()];
             case 2:
                 connection = _a.sent();
-                getTaggedGigsQuery = "SELECT gigId, status FROM taggedgigs WHERE userName = ".concat(connection.escape(name), " AND date > \"").concat(currentDate, "\"");
+                getTaggedGigsQuery = "SELECT gigId, status FROM taggedgigs WHERE userName = ".concat(connection.escape(name), " AND date > \"").concat(currentDate, " ORDER BY date ASC\"");
                 return [4 /*yield*/, (0, mysql_1.GigQuery)(connection, getTaggedGigsQuery)];
             case 3:
                 getTaggedGigsResult = _a.sent();
                 if (!(getTaggedGigsResult.length !== 0)) return [3 /*break*/, 5];
                 mappedResults = getTaggedGigsResult.map(function (g) { return g.gigId; });
-                gigDataQuery = "SELECT date, bands, id, venue FROM gigs WHERE id IN (".concat(mappedResults, ")");
-                return [4 /*yield*/, (0, mysql_1.TempQuery)(connection, gigDataQuery)
-                    //Assign the statuses we got earlier to the response object
-                ];
+                gigDataQuery = "SELECT date, bands, id, venue FROM gigs WHERE id IN (".concat(mappedResults, ") ORDER BY date ASC");
+                return [4 /*yield*/, (0, mysql_1.TempQuery)(connection, gigDataQuery)];
             case 4:
-                gigDataResult_1 = _a.sent();
-                //Assign the statuses we got earlier to the response object
-                getTaggedGigsResult.map(function (g) {
-                    var entry = {
-                        status: g.status
-                    };
-                    var index = gigDataResult_1.findIndex(function (item) { return item.id === g.gigId; });
-                    console.log(index);
-                    Object.assign(gigDataResult_1[index], entry);
-                });
+                gigDataResult = _a.sent();
+                appendedResponse = (0, appendStatusToResponse_1.appendStatusToResponse)(getTaggedGigsResult, gigDataResult);
                 connection.end();
                 return [2 /*return*/, res
                         .status(200)
-                        .json(gigDataResult_1)];
+                        .json(appendedResponse)];
             case 5:
                 connection.end;
+                console.log("No tagged gigs found");
                 return [2 /*return*/, res
-                        .status(400)
+                        .status(200)
                         .json("User has no tagged gigs")];
             case 6:
                 error_2 = _a.sent();
@@ -205,4 +201,35 @@ var getUsersTaggedGigs = function (req, res) { return __awaiter(void 0, void 0, 
         }
     });
 }); };
-exports.default = { getAllGigs: getAllGigs, getGigsByMonth: getGigsByMonth, tagGig: tagGig, getUsersTaggedGigs: getUsersTaggedGigs };
+var deleteTag = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var userName, gigId, connection, deleteTagQuery, deleteTagResult, error_3;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                userName = req.body.decodedToken.name;
+                gigId = req.body.gigToDeleteId;
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 4, , 5]);
+                return [4 /*yield*/, (0, mysql_1.Connect)()];
+            case 2:
+                connection = _a.sent();
+                deleteTagQuery = "DELETE FROM taggedgigs WHERE userName = ".concat(connection.escape(userName), " AND gigId = \"").concat(gigId, "\"");
+                return [4 /*yield*/, (0, mysql_1.GigQuery)(connection, deleteTagQuery)];
+            case 3:
+                deleteTagResult = _a.sent();
+                connection.end();
+                return [2 /*return*/, res
+                        .status(200)
+                        .json(deleteTagResult)];
+            case 4:
+                error_3 = _a.sent();
+                console.log(error_3);
+                return [2 /*return*/, res
+                        .status(400)
+                        .json({ message: error_3.message, field: 'critical' })];
+            case 5: return [2 /*return*/];
+        }
+    });
+}); };
+exports.default = { getAllGigs: getAllGigs, getGigsByMonth: getGigsByMonth, tagGig: tagGig, getUsersTaggedGigs: getUsersTaggedGigs, deleteTag: deleteTag };

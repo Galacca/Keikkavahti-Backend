@@ -56,6 +56,7 @@ var auth = function (req, res, next) { return __awaiter(void 0, void 0, void 0, 
             next();
         }
         catch (err) {
+            console.log("Authorization failure");
             res.status(401).send('Authorization failure');
         }
         return [2 /*return*/];

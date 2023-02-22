@@ -17,6 +17,7 @@ var corsOpts = {
     methods: [
         'GET',
         'POST',
+        'DELETE'
     ],
     allowedHeaders: [
         'Content-Type', 'Authorization',

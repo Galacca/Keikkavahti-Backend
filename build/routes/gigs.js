@@ -10,4 +10,5 @@ router.get('/get/allgigs', gigs_1.default.getAllGigs);
 router.post('/get/bymonth', gigs_1.default.getGigsByMonth);
 router.post('/post/tagGig', authentication_1.auth, gigs_1.default.tagGig);
 router.post('/post/getTaggedGigs', authentication_1.auth, gigs_1.default.getUsersTaggedGigs);
+router.delete('/delete/tagGig', authentication_1.auth, gigs_1.default.deleteTag);
 module.exports = router;
