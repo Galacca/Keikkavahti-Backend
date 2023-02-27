@@ -3,9 +3,9 @@ import config from "./config/config";
 import allGigRoutes from "./routes/gigs";
 import allUserRoutes from "./routes/users";
 import allFriendRoutes from "./routes/friends";
-import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
+import express, {Response} from 'express'
 
 const router = express();
 
@@ -25,7 +25,7 @@ router.use("/users", allUserRoutes);
 router.use("/gigs", allGigRoutes);
 router.use("/friends", allFriendRoutes);
 
-router.use((req, res, next) => {
+router.use((res: Response) => {
   const error = new Error("Not found");
 
   res.status(404).json({
