@@ -8,12 +8,12 @@ var config_1 = __importDefault(require("./config/config"));
 var gigs_1 = __importDefault(require("./routes/gigs"));
 var users_1 = __importDefault(require("./routes/users"));
 var friends_1 = __importDefault(require("./routes/friends"));
-var express_1 = __importDefault(require("express"));
 var body_parser_1 = __importDefault(require("body-parser"));
 var cors_1 = __importDefault(require("cors"));
+var express_1 = __importDefault(require("express"));
 var router = (0, express_1.default)();
 var corsOpts = {
-    origin: "http://127.0.0.1:5173",
+    origin: "*",
     methods: ["GET", "POST", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
 };
@@ -23,7 +23,7 @@ router.use(body_parser_1.default.json());
 router.use("/users", users_1.default);
 router.use("/gigs", gigs_1.default);
 router.use("/friends", friends_1.default);
-router.use(function (req, res, next) {
+router.use(function (res) {
     var error = new Error("Not found");
     res.status(404).json({
         message: error.message,
