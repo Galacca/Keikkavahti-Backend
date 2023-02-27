@@ -10,7 +10,7 @@ var params = {
     user: config_1.default.mysql.user,
     password: config_1.default.mysql.pass,
     host: config_1.default.mysql.host,
-    database: config_1.default.mysql.database
+    database: config_1.default.mysql.database,
 };
 var Connect = function () {
     return new Promise(function (resolve, reject) {

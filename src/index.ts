@@ -10,7 +10,7 @@ import cors from "cors";
 const router = express();
 
 const corsOpts = {
-  origin: "http://127.0.0.1:5173",
+  origin: "*",
 
   methods: ["GET", "POST", "DELETE"],
 

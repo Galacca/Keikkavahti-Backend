@@ -52,20 +52,16 @@ var getFriendsList = function (req, res) { return __awaiter(void 0, void 0, void
                 friendsQuery = "SELECT friendName FROM friends WHERE userId = ".concat(connection.escape(userId));
                 return [4 /*yield*/, (0, mysql_1.UserQuery)(connection, friendsQuery)];
             case 3:
-                friendsResult = _a.sent();
+                friendsResult = (_a.sent());
                 console.log(friendsResult);
                 friendsArray = friendsResult.map(function (f) { return f.friendName; });
                 connection.end();
                 //Just for debugging
                 //if (friendsArray.length === 0) return res.status(200).json({ friends: 'User has no friends' })
-                return [2 /*return*/, res
-                        .status(200)
-                        .json(friendsArray)];
+                return [2 /*return*/, res.status(200).json(friendsArray)];
             case 4:
                 error_1 = _a.sent();
-                return [2 /*return*/, res
-                        .status(400)
-                        .json({ message: error_1.message, field: 'critical' })];
+                return [2 /*return*/, res.status(400).json({ message: error_1.message, field: "critical" })];
             case 5: return [2 /*return*/];
         }
     });

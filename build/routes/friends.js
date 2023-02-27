@@ -6,5 +6,5 @@ var express_1 = __importDefault(require("express"));
 var friends_1 = __importDefault(require("../controllers/friends"));
 var authentication_1 = require("../middlewares/authentication");
 var router = express_1.default.Router();
-router.get('/get/friendslist', authentication_1.auth, friends_1.default.getFriendsList);
+router.get("/get/friendslist", authentication_1.auth, friends_1.default.getFriendsList);
 module.exports = router;

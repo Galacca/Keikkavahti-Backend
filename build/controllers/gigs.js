@@ -46,16 +46,14 @@ var getAllGigs = function (req, res) { return __awaiter(void 0, void 0, void 0, 
             var query = "SELECT * FROM gigs WHERE date > \"".concat(currentDate, "\" ORDER BY date ASC");
             (0, mysql_1.GigQuery)(connection, query)
                 .then(function (results) {
-                return res
-                    .status(200)
-                    .json({
-                    results: results
+                return res.status(200).json({
+                    results: results,
                 });
             })
                 .catch(function (error) {
                 return res
                     .status(400)
-                    .json({ message: "Query failure", field: 'critical' });
+                    .json({ message: "Query failure", field: "critical" });
             })
                 .finally(function () {
                 connection.end();
@@ -64,7 +62,7 @@ var getAllGigs = function (req, res) { return __awaiter(void 0, void 0, void 0, 
             .catch(function (error) {
             return res
                 .status(400)
-                .json({ message: "Server status failure", field: 'critical' });
+                .json({ message: "Server status failure", field: "critical" });
         });
         return [2 /*return*/];
     });
@@ -76,19 +74,21 @@ var getGigsByMonth = function (req, res) { return __awaiter(void 0, void 0, void
         lowRange = req.body.year + "-".concat(req.body.month).concat("-0");
         (0, mysql_1.Connect)()
             .then(function (connection) {
-            var query = "SELECT * FROM gigs WHERE date < " + connection.escape(highRange) + " AND date > " + connection.escape(lowRange) + " ORDER BY date ASC";
+            var query = "SELECT * FROM gigs WHERE date < " +
+                connection.escape(highRange) +
+                " AND date > " +
+                connection.escape(lowRange) +
+                " ORDER BY date ASC";
             (0, mysql_1.GigQuery)(connection, query)
                 .then(function (results) {
-                return res
-                    .status(200)
-                    .json({
-                    results: results
+                return res.status(200).json({
+                    results: results,
                 });
             })
                 .catch(function (error) {
                 return res
                     .status(400)
-                    .json({ message: "Query failure", field: 'critical' });
+                    .json({ message: "Query failure", field: "critical" });
             })
                 .finally(function () {
                 connection.end();
@@ -97,7 +97,7 @@ var getGigsByMonth = function (req, res) { return __awaiter(void 0, void 0, void
             .catch(function (error) {
             return res
                 .status(400)
-                .json({ message: "Server failure", field: 'critical' });
+                .json({ message: "Server failure", field: "critical" });
         });
         return [2 /*return*/];
     });
@@ -120,39 +120,42 @@ var tagGig = function (req, res) { return __awaiter(void 0, void 0, void 0, func
                 duplicateTagQuery = "SELECT status FROM taggedgigs WHERE gigId = ".concat(connection.escape(gigId), " AND userName = ").concat(connection.escape(userName));
                 return [4 /*yield*/, (0, mysql_1.GigQuery)(connection, duplicateTagQuery)];
             case 3:
-                isDuplicateTag = _a.sent();
+                isDuplicateTag = (_a.sent());
                 tagQuery = void 0;
                 if (!(isDuplicateTag.length === 0)) return [3 /*break*/, 5];
                 dateQuery = "SELECT date FROM gigs WHERE id = ".concat(connection.escape(gigId));
-                return [4 /*yield*/, (0, mysql_1.GigQuery)(connection, dateQuery)
-                    //Jesus christ help me. 
-                ];
+                return [4 /*yield*/, (0, mysql_1.GigQuery)(connection, dateQuery)];
             case 4:
                 dateResult = _a.sent();
-                //Jesus christ help me. 
-                tagQuery = "INSERT into taggedgigs (gigId, userName, status, date) VALUES (" + connection.escape(gigId) + ',' + connection.escape(userName) + ',' + connection.escape(operation) + ',' + connection.escape(dateResult[0].date) + ')';
+                //Jesus christ help me.
+                tagQuery =
+                    "INSERT into taggedgigs (gigId, userName, status, date) VALUES (" +
+                        connection.escape(gigId) +
+                        "," +
+                        connection.escape(userName) +
+                        "," +
+                        connection.escape(operation) +
+                        "," +
+                        connection.escape(dateResult[0].date) +
+                        ")";
                 return [3 /*break*/, 6];
             case 5:
                 if (isDuplicateTag[0].status === operation)
-                    throw new Error('You are already tagged as ' + operation + ' this gig.');
+                    throw new Error("You are already tagged as " + operation + " this gig.");
                 tagQuery = "UPDATE taggedgigs SET status = ".concat(connection.escape(operation), " WHERE gigId = ").concat(connection.escape(gigId), " AND userName = ").concat(connection.escape(userName));
                 _a.label = 6;
-            case 6: 
-            //We do not need this is a variable since the frontend 'mimics' the database changes with state
-            return [4 /*yield*/, (0, mysql_1.GigQuery)(connection, tagQuery)];
+            case 6: return [4 /*yield*/, (0, mysql_1.GigQuery)(connection, tagQuery)];
             case 7:
                 //We do not need this is a variable since the frontend 'mimics' the database changes with state
-                _a.sent();
+                (_a.sent());
                 connection.end();
-                return [2 /*return*/, res
-                        .status(200)
-                        .json({ message: 'Operation success' })];
+                return [2 /*return*/, res.status(200).json({ message: "Operation success" })];
             case 8:
                 error_1 = _a.sent();
                 console.log(error_1.message);
                 return [2 /*return*/, res
                         .status(400)
-                        .json({ message: error_1.message, field: 'critical' })];
+                        .json({ message: error_1.message, field: "critical" })];
             case 9: return [2 /*return*/];
         }
     });
@@ -173,7 +176,7 @@ var getUsersTaggedGigs = function (req, res) { return __awaiter(void 0, void 0, 
                 getTaggedGigsQuery = "SELECT gigId, status FROM taggedgigs WHERE userName = ".concat(connection.escape(name), " AND date > \"").concat(currentDate, " ORDER BY date ASC\"");
                 return [4 /*yield*/, (0, mysql_1.GigQuery)(connection, getTaggedGigsQuery)];
             case 3:
-                getTaggedGigsResult = _a.sent();
+                getTaggedGigsResult = (_a.sent());
                 if (!(getTaggedGigsResult.length !== 0)) return [3 /*break*/, 5];
                 mappedResults = getTaggedGigsResult.map(function (g) { return g.gigId; });
                 gigDataQuery = "SELECT date, bands, id, venue FROM gigs WHERE id IN (".concat(mappedResults, ") ORDER BY date ASC");
@@ -182,21 +185,15 @@ var getUsersTaggedGigs = function (req, res) { return __awaiter(void 0, void 0, 
                 gigDataResult = _a.sent();
                 appendedResponse = (0, appendStatusToResponse_1.appendStatusToResponse)(getTaggedGigsResult, gigDataResult);
                 connection.end();
-                return [2 /*return*/, res
-                        .status(200)
-                        .json(appendedResponse)];
+                return [2 /*return*/, res.status(200).json(appendedResponse)];
             case 5:
                 connection.end;
                 console.log("No tagged gigs found");
-                return [2 /*return*/, res
-                        .status(200)
-                        .json("User has no tagged gigs")];
+                return [2 /*return*/, res.status(200).json("User has no tagged gigs")];
             case 6:
                 error_2 = _a.sent();
                 console.log(error_2);
-                return [2 /*return*/, res
-                        .status(400)
-                        .json({ message: error_2.message, field: 'critical' })];
+                return [2 /*return*/, res.status(400).json({ message: error_2.message, field: "critical" })];
             case 7: return [2 /*return*/];
         }
     });
@@ -217,19 +214,21 @@ var deleteTag = function (req, res) { return __awaiter(void 0, void 0, void 0, f
                 deleteTagQuery = "DELETE FROM taggedgigs WHERE userName = ".concat(connection.escape(userName), " AND gigId = \"").concat(gigId, "\"");
                 return [4 /*yield*/, (0, mysql_1.GigQuery)(connection, deleteTagQuery)];
             case 3:
-                deleteTagResult = _a.sent();
+                deleteTagResult = (_a.sent());
                 connection.end();
-                return [2 /*return*/, res
-                        .status(200)
-                        .json(deleteTagResult)];
+                return [2 /*return*/, res.status(200).json(deleteTagResult)];
             case 4:
                 error_3 = _a.sent();
                 console.log(error_3);
-                return [2 /*return*/, res
-                        .status(400)
-                        .json({ message: error_3.message, field: 'critical' })];
+                return [2 /*return*/, res.status(400).json({ message: error_3.message, field: "critical" })];
             case 5: return [2 /*return*/];
         }
     });
 }); };
-exports.default = { getAllGigs: getAllGigs, getGigsByMonth: getGigsByMonth, tagGig: tagGig, getUsersTaggedGigs: getUsersTaggedGigs, deleteTag: deleteTag };
+exports.default = {
+    getAllGigs: getAllGigs,
+    getGigsByMonth: getGigsByMonth,
+    tagGig: tagGig,
+    getUsersTaggedGigs: getUsersTaggedGigs,
+    deleteTag: deleteTag,
+};

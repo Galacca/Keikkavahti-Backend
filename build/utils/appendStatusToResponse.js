@@ -6,7 +6,7 @@ exports.appendStatusToResponse = void 0;
 var appendStatusToResponse = function (taggedGigsArray, simplifiedGigArray) {
     taggedGigsArray.map(function (g) {
         var entry = {
-            status: g.status
+            status: g.status,
         };
         var index = simplifiedGigArray.findIndex(function (item) { return item.id === g.gigId; });
         Object.assign(simplifiedGigArray[index], entry);

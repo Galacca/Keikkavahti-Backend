@@ -47,7 +47,7 @@ var auth = function (req, res, next) { return __awaiter(void 0, void 0, void 0, 
     var _a;
     return __generator(this, function (_b) {
         try {
-            token = (_a = req.header('Authorization')) === null || _a === void 0 ? void 0 : _a.substring(7);
+            token = (_a = req.header("Authorization")) === null || _a === void 0 ? void 0 : _a.substring(7);
             if (!token) {
                 throw new Error();
             }
@@ -57,7 +57,7 @@ var auth = function (req, res, next) { return __awaiter(void 0, void 0, void 0, 
         }
         catch (err) {
             console.log("Authorization failure");
-            res.status(401).send('Authorization failure');
+            res.status(401).send("Authorization failure");
         }
         return [2 /*return*/];
     });

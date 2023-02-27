@@ -54,27 +54,28 @@ var login = function (req, res) { return __awaiter(void 0, void 0, void 0, funct
                 catch (error) {
                     return [2 /*return*/, res
                             .status(400)
-                            .json(error.issues.map(function (issue) { return ({ message: issue.message, field: issue.path.join() }); }))];
+                            .json(error.issues.map(function (issue) { return ({
+                            message: issue.message,
+                            field: issue.path.join(),
+                        }); }))];
                 }
                 return [4 /*yield*/, (0, mysql_1.Connect)()];
             case 1:
                 connection = _a.sent();
-                findUserQuery = "SELECT * FROM users WHERE username = " + connection.escape(req.body.username.toLowerCase()) + "";
-                return [4 /*yield*/, (0, mysql_1.UserQuery)(connection, findUserQuery)
-                    //user can end up as undefined, but we catch it early and throw. Still not the best solution? Not sure.
-                ];
+                findUserQuery = "SELECT * FROM users WHERE username = " +
+                    connection.escape(req.body.username.toLowerCase()) +
+                    "";
+                return [4 /*yield*/, (0, mysql_1.UserQuery)(connection, findUserQuery)];
             case 2:
                 queriedUser = _a.sent();
                 user = queriedUser[0];
                 connection.end();
                 try {
                     if (!user)
-                        throw new Error('Username does not exist');
+                        throw new Error("Username does not exist");
                 }
                 catch (error) {
-                    return [2 /*return*/, res
-                            .status(400)
-                            .json({ message: error.message, field: 'username' })];
+                    return [2 /*return*/, res.status(400).json({ message: error.message, field: "username" })];
                 }
                 _a.label = 3;
             case 3:
@@ -87,9 +88,7 @@ var login = function (req, res) { return __awaiter(void 0, void 0, void 0, funct
                 return [3 /*break*/, 6];
             case 5:
                 error_1 = _a.sent();
-                return [2 /*return*/, res
-                        .status(400)
-                        .json({ message: error_1.message, field: 'password' })];
+                return [2 /*return*/, res.status(400).json({ message: error_1.message, field: "password" })];
             case 6:
                 try {
                     userForToken = {
@@ -99,12 +98,15 @@ var login = function (req, res) { return __awaiter(void 0, void 0, void 0, funct
                     token = (0, signToken_1.signToken)(userForToken);
                     return [2 /*return*/, res
                             .status(200)
-                            .json({ token: token, user: user.username, id: user.id, name: user.name })];
+                            .json({
+                            token: token,
+                            user: user.username,
+                            id: user.id,
+                            name: user.name,
+                        })];
                 }
                 catch (error) {
-                    return [2 /*return*/, res
-                            .status(400)
-                            .json({ message: error.message, field: 'username' })];
+                    return [2 /*return*/, res.status(400).json({ message: error.message, field: "username" })];
                 }
                 return [2 /*return*/];
         }
@@ -121,58 +123,59 @@ var signup = function (req, res) { return __awaiter(void 0, void 0, void 0, func
                 catch (error) {
                     return [2 /*return*/, res
                             .status(400)
-                            .json(error.issues.map(function (issue) { return ({ message: issue.message, field: issue.path.join() }); }))];
+                            .json(error.issues.map(function (issue) { return ({
+                            message: issue.message,
+                            field: issue.path.join(),
+                        }); }))];
                 }
                 return [4 /*yield*/, (0, mysql_1.Connect)()];
             case 1:
                 connection = _a.sent();
-                duplicateUserQuery = "SELECT EXISTS(SELECT \"username\" FROM users WHERE username = " + connection.escape(req.body.username) + ") as TRUTH";
+                duplicateUserQuery = "SELECT EXISTS(SELECT \"username\" FROM users WHERE username = " +
+                    connection.escape(req.body.username) +
+                    ") as TRUTH";
                 _a.label = 2;
             case 2:
                 _a.trys.push([2, 4, , 5]);
                 return [4 /*yield*/, (0, mysql_1.UserQuery)(connection, duplicateUserQuery)];
             case 3:
-                duplicateUsername = _a.sent();
+                duplicateUsername = (_a.sent());
                 if (Object.values(duplicateUsername[0]).includes(1))
-                    throw new Error('Username already exists');
+                    throw new Error("Username already exists");
                 return [3 /*break*/, 5];
             case 4:
                 error_2 = _a.sent();
                 connection.end();
-                return [2 /*return*/, res
-                        .status(400)
-                        .json({ message: error_2.message, field: 'username' })];
+                return [2 /*return*/, res.status(400).json({ message: error_2.message, field: "username" })];
             case 5:
-                duplicateNameQuery = "SELECT EXISTS(SELECT \"username\" FROM users WHERE name = " + connection.escape(req.body.name) + ") as TRUTH";
+                duplicateNameQuery = "SELECT EXISTS(SELECT \"username\" FROM users WHERE name = " +
+                    connection.escape(req.body.name) +
+                    ") as TRUTH";
                 _a.label = 6;
             case 6:
                 _a.trys.push([6, 8, , 9]);
                 return [4 /*yield*/, (0, mysql_1.UserQuery)(connection, duplicateNameQuery)];
             case 7:
-                duplicateName = _a.sent();
+                duplicateName = (_a.sent());
                 if (Object.values(duplicateName[0]).includes(1))
-                    throw new Error('Name/handle already exists');
+                    throw new Error("Name/handle already exists");
                 return [3 /*break*/, 9];
             case 8:
                 error_3 = _a.sent();
                 connection.end();
-                return [2 /*return*/, res
-                        .status(400)
-                        .json({ message: error_3.message, field: 'name' })];
+                return [2 /*return*/, res.status(400).json({ message: error_3.message, field: "name" })];
             case 9:
                 _a.trys.push([9, 13, , 14]);
-                return [4 /*yield*/, argon2_1.default.hash(req.body.password)
-                    //Escape the hashed password since it can contain special characters that confuse the query
-                ];
+                return [4 /*yield*/, argon2_1.default.hash(req.body.password)];
             case 10:
                 hashedPassword = _a.sent();
                 insertNewUserquery = "INSERT INTO users (username, password, name) VALUES (".concat(connection.escape(req.body.username.toLowerCase()), ",").concat(connection.escape(hashedPassword), ",").concat(connection.escape(req.body.name), ")");
-                return [4 /*yield*/, (0, mysql_1.UserQuery)(connection, insertNewUserquery)
-                    //Get the newly inserted data so we can sign them in right away. We have to do this since we do not know the ID otherwise.
-                ];
+                return [4 /*yield*/, (0, mysql_1.UserQuery)(connection, insertNewUserquery)];
             case 11:
                 _a.sent();
-                findUserQuery = "SELECT * FROM users WHERE username = " + connection.escape(req.body.username.toLowerCase()) + "";
+                findUserQuery = "SELECT * FROM users WHERE username = " +
+                    connection.escape(req.body.username.toLowerCase()) +
+                    "";
                 return [4 /*yield*/, (0, mysql_1.UserQuery)(connection, findUserQuery)];
             case 12:
                 queriedUser = _a.sent();
@@ -186,12 +189,15 @@ var signup = function (req, res) { return __awaiter(void 0, void 0, void 0, func
                 token = (0, signToken_1.signToken)(userForToken);
                 return [2 /*return*/, res
                         .status(200)
-                        .json({ token: token, user: user.username, id: user.id, name: user.name })];
+                        .json({
+                        token: token,
+                        user: user.username,
+                        id: user.id,
+                        name: user.name,
+                    })];
             case 13:
                 error_4 = _a.sent();
-                return [2 /*return*/, res
-                        .status(400)
-                        .json({ message: error_4.message, field: 'critical' })];
+                return [2 /*return*/, res.status(400).json({ message: error_4.message, field: "critical" })];
             case 14: return [2 /*return*/];
         }
     });
@@ -221,10 +227,14 @@ var addFriend = function (req, res) { return __awaiter(void 0, void 0, void 0, f
                 userIsFriendToAddResult = _a.sent();
                 if (userIsFriendToAddResult[0].id === friendRequester)
                     throw new Error("You cannot add yourself as your friend.");
-                duplicateFriendQuery = "SELECT EXISTS(SELECT id FROM friends WHERE friendName = " + connection.escape(friendToAdd) + " AND userId = " + connection.escape(friendRequester) + ") as TRUTH";
+                duplicateFriendQuery = "SELECT EXISTS(SELECT id FROM friends WHERE friendName = " +
+                    connection.escape(friendToAdd) +
+                    " AND userId = " +
+                    connection.escape(friendRequester) +
+                    ") as TRUTH";
                 return [4 /*yield*/, (0, mysql_1.UserQuery)(connection, duplicateFriendQuery)];
             case 5:
-                duplicateFriendResult = _a.sent();
+                duplicateFriendResult = (_a.sent());
                 if (duplicateFriendResult[0].TRUTH === 1)
                     throw new Error("User named " + friendToAdd + " is already on your friends list.");
                 addNewFriendQuery = "INSERT INTO friends (userId, friendName) VALUES (".concat(connection.escape(friendRequester), ",").concat(connection.escape(friendToAdd), ")");
@@ -233,14 +243,12 @@ var addFriend = function (req, res) { return __awaiter(void 0, void 0, void 0, f
             case 6:
                 _a.sent();
                 connection.end();
-                return [2 /*return*/, res
-                        .status(201)
-                        .json("New friend added succesfully")];
+                return [2 /*return*/, res.status(201).json("New friend added succesfully")];
             case 7:
                 error_5 = _a.sent();
                 return [2 /*return*/, res
                         .status(400)
-                        .json({ message: error_5.message, field: 'friendToAddName' })];
+                        .json({ message: error_5.message, field: "friendToAddName" })];
             case 8: return [2 /*return*/];
         }
     });
