@@ -23,7 +23,7 @@ router.use(body_parser_1.default.json());
 router.use("/users", users_1.default);
 router.use("/gigs", gigs_1.default);
 router.use("/friends", friends_1.default);
-router.use(function (res) {
+router.use(function (req, res, next) {
     var error = new Error("Not found");
     res.status(404).json({
         message: error.message,

@@ -7,7 +7,6 @@ exports.signToken = void 0;
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 var signToken = function (userForToken) {
     var token = jsonwebtoken_1.default.sign(userForToken, process.env.TOKEN_SECRET);
-    console.log(token);
     return token;
 };
 exports.signToken = signToken;

@@ -52,9 +52,7 @@ var login = function (req, res) { return __awaiter(void 0, void 0, void 0, funct
                     UserSchema_1.LoginSchema.parse(req.body);
                 }
                 catch (error) {
-                    return [2 /*return*/, res
-                            .status(400)
-                            .json(error.issues.map(function (issue) { return ({
+                    return [2 /*return*/, res.status(400).json(error.issues.map(function (issue) { return ({
                             message: issue.message,
                             field: issue.path.join(),
                         }); }))];
@@ -96,9 +94,7 @@ var login = function (req, res) { return __awaiter(void 0, void 0, void 0, funct
                         id: user.id,
                     };
                     token = (0, signToken_1.signToken)(userForToken);
-                    return [2 /*return*/, res
-                            .status(200)
-                            .json({
+                    return [2 /*return*/, res.status(200).json({
                             token: token,
                             user: user.username,
                             id: user.id,
@@ -121,9 +117,7 @@ var signup = function (req, res) { return __awaiter(void 0, void 0, void 0, func
                     UserSchema_1.SignUpSchema.parse(req.body);
                 }
                 catch (error) {
-                    return [2 /*return*/, res
-                            .status(400)
-                            .json(error.issues.map(function (issue) { return ({
+                    return [2 /*return*/, res.status(400).json(error.issues.map(function (issue) { return ({
                             message: issue.message,
                             field: issue.path.join(),
                         }); }))];
@@ -180,16 +174,13 @@ var signup = function (req, res) { return __awaiter(void 0, void 0, void 0, func
             case 12:
                 queriedUser = _a.sent();
                 user = queriedUser[0];
-                console.log(user);
                 connection.end();
                 userForToken = {
                     name: user.name,
                     id: user.id,
                 };
                 token = (0, signToken_1.signToken)(userForToken);
-                return [2 /*return*/, res
-                        .status(200)
-                        .json({
+                return [2 /*return*/, res.status(200).json({
                         token: token,
                         user: user.username,
                         id: user.id,
@@ -238,7 +229,6 @@ var addFriend = function (req, res) { return __awaiter(void 0, void 0, void 0, f
                 if (duplicateFriendResult[0].TRUTH === 1)
                     throw new Error("User named " + friendToAdd + " is already on your friends list.");
                 addNewFriendQuery = "INSERT INTO friends (userId, friendName) VALUES (".concat(connection.escape(friendRequester), ",").concat(connection.escape(friendToAdd), ")");
-                console.log(addNewFriendQuery);
                 return [4 /*yield*/, (0, mysql_1.UserQuery)(connection, addNewFriendQuery)];
             case 6:
                 _a.sent();

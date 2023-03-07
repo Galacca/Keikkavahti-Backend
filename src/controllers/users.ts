@@ -9,14 +9,12 @@ const login = async (req: Request, res: Response) => {
   try {
     LoginSchema.parse(req.body);
   } catch (error: any) {
-    return res
-      .status(400)
-      .json(
-        error.issues.map((issue: ZodIssue) => ({
-          message: issue.message,
-          field: issue.path.join(),
-        }))
-      );
+    return res.status(400).json(
+      error.issues.map((issue: ZodIssue) => ({
+        message: issue.message,
+        field: issue.path.join(),
+      }))
+    );
   }
 
   const connection = await Connect();
@@ -50,14 +48,12 @@ const login = async (req: Request, res: Response) => {
 
     const token = signToken(userForToken);
 
-    return res
-      .status(200)
-      .json({
-        token: token,
-        user: user.username,
-        id: user.id,
-        name: user.name,
-      });
+    return res.status(200).json({
+      token: token,
+      user: user.username,
+      id: user.id,
+      name: user.name,
+    });
   } catch (error: any) {
     return res.status(400).json({ message: error.message, field: "username" });
   }
@@ -67,14 +63,12 @@ const signup = async (req: Request, res: Response) => {
   try {
     SignUpSchema.parse(req.body);
   } catch (error: any) {
-    return res
-      .status(400)
-      .json(
-        error.issues.map((issue: ZodIssue) => ({
-          message: issue.message,
-          field: issue.path.join(),
-        }))
-      );
+    return res.status(400).json(
+      error.issues.map((issue: ZodIssue) => ({
+        message: issue.message,
+        field: issue.path.join(),
+      }))
+    );
   }
 
   const connection = await Connect();
@@ -131,7 +125,6 @@ const signup = async (req: Request, res: Response) => {
       ``;
     const queriedUser = await UserQuery(connection, findUserQuery);
     const user = queriedUser[0];
-    console.log(user);
     connection.end();
 
     const userForToken = {
@@ -141,14 +134,12 @@ const signup = async (req: Request, res: Response) => {
 
     const token = signToken(userForToken);
 
-    return res
-      .status(200)
-      .json({
-        token: token,
-        user: user.username,
-        id: user.id,
-        name: user.name,
-      });
+    return res.status(200).json({
+      token: token,
+      user: user.username,
+      id: user.id,
+      name: user.name,
+    });
   } catch (error: any) {
     return res.status(400).json({ message: error.message, field: "critical" });
   }
@@ -200,7 +191,7 @@ const addFriend = async (req: Request, res: Response) => {
     const addNewFriendQuery = `INSERT INTO friends (userId, friendName) VALUES (${connection.escape(
       friendRequester
     )},${connection.escape(friendToAdd)})`;
-    console.log(addNewFriendQuery);
+
     await UserQuery(connection, addNewFriendQuery);
     connection.end();
 

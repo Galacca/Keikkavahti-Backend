@@ -11,7 +11,6 @@ const getFriendsList = async (req: Request, res: Response) => {
     )}`;
     //Once again...Need to write a type for this
     const friendsResult = (await UserQuery(connection, friendsQuery)) as any;
-    console.log(friendsResult);
     const friendsArray = friendsResult.map(
       (f: { friendName: string }) => f.friendName
     );

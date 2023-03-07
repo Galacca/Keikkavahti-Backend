@@ -69,8 +69,6 @@ const getGigsByMonth = async (req: Request, res: Response) => {
 };
 
 const tagGig = async (req: Request, res: Response) => {
-  console.log(req.body);
-
   const userName: string = req.body.decodedToken.name;
   const gigId: number = req.body.gigToTagId;
   const operation: string = req.body.operation;
@@ -124,7 +122,6 @@ const tagGig = async (req: Request, res: Response) => {
 
     return res.status(200).json({ message: "Operation success" });
   } catch (error: any) {
-    console.log(error.message);
     return res
       .status(400)
 
@@ -135,7 +132,6 @@ const tagGig = async (req: Request, res: Response) => {
 const getUsersTaggedGigs = async (req: Request, res: Response) => {
   const name: string = req.body.name;
 
-  console.log(name);
   try {
     const connection = await Connect();
     const getTaggedGigsQuery = `SELECT gigId, status FROM taggedgigs WHERE userName = ${connection.escape(
@@ -145,8 +141,6 @@ const getUsersTaggedGigs = async (req: Request, res: Response) => {
       connection,
       getTaggedGigsQuery
     )) as any;
-
-    //console.log(getTaggedGigsResult)
 
     if (getTaggedGigsResult.length !== 0) {
       const mappedResults = getTaggedGigsResult.map(
@@ -165,7 +159,6 @@ const getUsersTaggedGigs = async (req: Request, res: Response) => {
     }
 
     connection.end;
-    console.log("No tagged gigs found");
     return res.status(200).json("User has no tagged gigs");
   } catch (error: any) {
     console.log(error);

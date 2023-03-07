@@ -53,7 +53,6 @@ var getFriendsList = function (req, res) { return __awaiter(void 0, void 0, void
                 return [4 /*yield*/, (0, mysql_1.UserQuery)(connection, friendsQuery)];
             case 3:
                 friendsResult = (_a.sent());
-                console.log(friendsResult);
                 friendsArray = friendsResult.map(function (f) { return f.friendName; });
                 connection.end();
                 //Just for debugging

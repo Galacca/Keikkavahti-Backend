@@ -107,7 +107,6 @@ var tagGig = function (req, res) { return __awaiter(void 0, void 0, void 0, func
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                console.log(req.body);
                 userName = req.body.decodedToken.name;
                 gigId = req.body.gigToTagId;
                 operation = req.body.operation;
@@ -152,7 +151,6 @@ var tagGig = function (req, res) { return __awaiter(void 0, void 0, void 0, func
                 return [2 /*return*/, res.status(200).json({ message: "Operation success" })];
             case 8:
                 error_1 = _a.sent();
-                console.log(error_1.message);
                 return [2 /*return*/, res
                         .status(400)
                         .json({ message: error_1.message, field: "critical" })];
@@ -166,7 +164,6 @@ var getUsersTaggedGigs = function (req, res) { return __awaiter(void 0, void 0, 
         switch (_a.label) {
             case 0:
                 name = req.body.name;
-                console.log(name);
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 6, , 7]);
@@ -188,7 +185,6 @@ var getUsersTaggedGigs = function (req, res) { return __awaiter(void 0, void 0, 
                 return [2 /*return*/, res.status(200).json(appendedResponse)];
             case 5:
                 connection.end;
-                console.log("No tagged gigs found");
                 return [2 /*return*/, res.status(200).json("User has no tagged gigs")];
             case 6:
                 error_2 = _a.sent();

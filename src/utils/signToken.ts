@@ -7,6 +7,5 @@ interface userForTokenType {
 
 export const signToken = (userForToken: userForTokenType) => {
   const token = jwt.sign(userForToken, process.env.TOKEN_SECRET as Secret);
-  console.log(token);
   return token;
 };
