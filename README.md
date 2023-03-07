@@ -4,12 +4,12 @@ https://github.com/Galacca/Keikkavahti-frontend
 
 # What technologies did I use for the backend?
 
-Node.js
-Express
-Zod
-JsonWebToken
-DotEnv
-MySQL
+Node.js,
+Express,
+Zod,
+JsonWebToken,
+DotEnv,
+MySQL,
 AWS
 
 # Why not use an ORM?
