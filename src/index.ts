@@ -3,6 +3,7 @@ import config from "./config/config";
 import allGigRoutes from "./routes/gigs";
 import allUserRoutes from "./routes/users";
 import allFriendRoutes from "./routes/friends";
+import allHealthCheckRoutes from "./routes/healthcheck"
 import bodyParser from "body-parser";
 import cors from "cors";
 import express, {Request, Response} from 'express'
@@ -24,6 +25,8 @@ router.use(bodyParser.json());
 router.use("/users", allUserRoutes);
 router.use("/gigs", allGigRoutes);
 router.use("/friends", allFriendRoutes);
+router.use("/healthcheck", allHealthCheckRoutes)
+
 
 router.use((req: Request, res: Response, next) => {
   const error = new Error("Not found");

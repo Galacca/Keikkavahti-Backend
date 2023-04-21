@@ -139,8 +139,10 @@ var tagGig = function (req, res) { return __awaiter(void 0, void 0, void 0, func
                         ")";
                 return [3 /*break*/, 6];
             case 5:
-                if (isDuplicateTag[0].status === operation)
+                if (isDuplicateTag[0].status === operation) {
+                    connection.end();
                     throw new Error("You are already tagged as " + operation + " this gig.");
+                }
                 tagQuery = "UPDATE taggedgigs SET status = ".concat(connection.escape(operation), " WHERE gigId = ").concat(connection.escape(gigId), " AND userName = ").concat(connection.escape(userName));
                 _a.label = 6;
             case 6: return [4 /*yield*/, (0, mysql_1.GigQuery)(connection, tagQuery)];
