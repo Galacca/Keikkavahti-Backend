@@ -3,7 +3,7 @@ import config from "./config/config";
 import allGigRoutes from "./routes/gigs";
 import allUserRoutes from "./routes/users";
 import allFriendRoutes from "./routes/friends";
-import allHealthCheckRoutes from "./routes/healthcheck"
+import allHealthCheckRoutes from "./routes/healthCheck"
 import bodyParser from "body-parser";
 import cors from "cors";
 import express, {Request, Response} from 'express'
