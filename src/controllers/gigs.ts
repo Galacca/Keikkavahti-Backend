@@ -103,10 +103,12 @@ const tagGig = async (req: Request, res: Response) => {
         connection.escape(dateResult[0].date) +
         ")";
     } else {
-      if (isDuplicateTag[0].status === operation)
+      if (isDuplicateTag[0].status === operation) {
+        connection.end();
         throw new Error(
           "You are already tagged as " + operation + " this gig."
         );
+      }
 
       tagQuery = `UPDATE taggedgigs SET status = ${connection.escape(
         operation
